@@ -1,6 +1,6 @@
 import { getUUID } from './uuid.js';
 
-export default class Accordion {
+export default class {
   constructor(a) {
     const b = a.querySelectorAll('[data-accordion-trigger]:not(:scope [data-accordion-header] + * *)');
     b.forEach(c => {

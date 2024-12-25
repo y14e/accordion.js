@@ -1,12 +1,11 @@
 import { getUUID } from './uuid.js';
 
-// accordion [20241224]
+// accordion [20241225]
 export default class Accordion {
   constructor(a) {
-    const b = a.querySelectorAll('[data-accordion-header] button:not(:scope [data-accordion-header] + * *)');
+    const b = a.querySelectorAll('[data-accordion-trigger]:not(:scope [data-accordion-header] + * *)');
     b.forEach(c => {
       const d = c.closest('[data-accordion-header]').nextElementSibling;
-      c.type = 'button';
       c.setAttribute('aria-controls', d.id = d.id || `accordion-panel-${getUUID()}`);
       d.setAttribute('role', 'region');
       d.setAttribute('aria-labelledby', `${d.getAttribute('aria-labelledby') || ''} ${c.id = c.id || 'accordion-trigger-' + getUUID()}`.trim());
@@ -47,7 +46,8 @@ export default class Accordion {
           });
         }
       };
-      c.addEventListener('click', () => {
+      c.addEventListener('click', b => {
+        b.preventDefault();
         if (a.querySelector('[data-accordion-transitioning]')) {
           return;
         }

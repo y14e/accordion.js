@@ -1,6 +1,5 @@
 import { getUUID } from './uuid.js';
 
-// accordion [20241225]
 export default class Accordion {
   constructor(a) {
     const b = a.querySelectorAll('[data-accordion-trigger]:not(:scope [data-accordion-header] + * *)');

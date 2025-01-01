@@ -5,23 +5,24 @@ class Accordion {
     this.element = element;
     const NOT_NESTED = ':not(:scope [data-accordion-header] + * *)';
     this.triggers = this.element.querySelectorAll(`[data-accordion-trigger]${NOT_NESTED}`);
-    this.triggers.forEach(trigger => {
-      trigger.id = trigger.id || 'accordion-trigger-' + getUUID();
-      const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
-      panel.id = panel.id || `accordion-panel-${getUUID()}`;
-      trigger.setAttribute('aria-controls', panel.id);
-      trigger.addEventListener('click', event => {
-        this.click(event);
+    this.triggers
+      .forEach(trigger => {
+        trigger.id = trigger.id || 'accordion-trigger-' + getUUID();
+        const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
+        panel.id = panel.id || `accordion-panel-${getUUID()}`;
+        trigger.setAttribute('aria-controls', panel.id);
+        trigger.addEventListener('click', event => {
+          this.click(event);
+        });
+        trigger.addEventListener('keydown', event => {
+          this.keydown(event);
+        });
+        panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${trigger.id}`.trim());
+        panel.setAttribute('role', 'region');
+        panel.addEventListener('beforematch', event => {
+          this.beforematch(event);
+        });
       });
-      trigger.addEventListener('keydown', event => {
-        this.keydown(event);
-      });
-      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${trigger.id}`.trim());
-      panel.setAttribute('role', 'region');
-      panel.addEventListener('beforematch', event => {
-        this.beforematch(event);
-      });
-    });
   }
   toggle(trigger, open) {
     trigger.ariaExpanded = open;
@@ -61,7 +62,8 @@ class Accordion {
     if (this.element.querySelector('[data-accordion-transitioning]')) {
       return;
     }
-    this.toggle(event.currentTarget, event.currentTarget.ariaExpanded !== 'true');
+    const trigger = event.currentTarget;
+    this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
   keydown(event) {
     const key = event.key;

@@ -25,8 +25,6 @@ class Accordion {
       });
   }
   toggle(trigger, open) {
-    trigger.ariaExpanded = open;
-    trigger.dataset.accordionTransitioning = '';
     const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
@@ -41,6 +39,8 @@ class Accordion {
       panel.style.maxHeight = panel.style.overflow = '';
       this.removeEventListener('transitionend', once);
     });
+    trigger.ariaExpanded = open;
+    trigger.dataset.accordionTransitioning = '';
     panel.style.maxHeight = open ? 0 : height;
     panel.style.overflow = 'clip';
     requestAnimationFrame(() => {
@@ -51,7 +51,7 @@ class Accordion {
     const name = trigger.dataset.accordionName;
     if (open && name) {
       [...document.querySelectorAll(`[aria-expanded="true"][data-accordion-name="${name}"]`)]
-        .filter(t => t !== trigger)
+        .filter(opened => opened !== trigger)
         .forEach(trigger => {
           this.toggle(trigger, false);
         });

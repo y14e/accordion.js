@@ -1,72 +1,80 @@
 import { getUUID } from './uuid.js';
 
 class Accordion {
-  constructor(a) {
-    const b = a.querySelectorAll('[data-accordion-trigger]:not(:scope [data-accordion-header] + * *)');
-    b.forEach(c => {
-      const d = c.closest('[data-accordion-header]').nextElementSibling;
-      c.setAttribute('aria-controls', d.id = d.id || `accordion-panel-${getUUID()}`);
-      d.setAttribute('role', 'region');
-      d.setAttribute('aria-labelledby', `${d.getAttribute('aria-labelledby') || ''} ${c.id = c.id || 'accordion-trigger-' + getUUID()}`.trim());
-      const e = async (a, b) => {
-        const c = a.closest('[data-accordion-header]').nextElementSibling;
-        const d = c.style;
-        c.hidden = false;
-        const e = `${c.scrollHeight}px`;
-        const f = async () => {
-          for (let i = 0; i < 2; i++) {
-            await new Promise(requestAnimationFrame);
-          }
-        };
-        c.addEventListener('transitionend', function e(f) {
-          if (f.propertyName !== 'max-height') {
-            return;
-          }
-          delete a.dataset.accordionTransitioning;
-          if (!b) {
-            c.hidden = 'until-found';
-          }
-          d.maxHeight = d.overflow = '';
-          this.removeEventListener('transitionend', e);
-        });
-        a.dataset.accordionTransitioning = '';
-        a.ariaExpanded = b;
-        d.maxHeight = b ? 0 : e;
-        d.overflow = 'clip';
-        await f();
-        d.maxHeight = b ? e : 0;
-      };
-      const f = (a, b) => {
-        const c = a.dataset.accordionName;
-        e(a, b);
-        if (b && c) {
-          [...document.querySelectorAll(`[aria-expanded="true"][data-accordion-name="${c}"]`)].filter(b => b !== a).forEach(a => {
-            e(a, false);
-          });
-        }
-      };
-      c.addEventListener('click', b => {
-        b.preventDefault();
-        if (a.querySelector('[data-accordion-transitioning]')) {
-          return;
-        }
-        f(c, c.ariaExpanded !== 'true');
+  constructor(element) {
+    this.element = element;
+    const NOT_NESTED = ':not(:scope [data-accordion-header] + * *)';
+    this.triggers = this.element.querySelectorAll(`[data-accordion-trigger]${NOT_NESTED}`);
+    this.triggers.forEach(trigger => {
+      trigger.id = trigger.id || 'accordion-trigger-' + getUUID();
+      const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
+      panel.id = panel.id || `accordion-panel-${getUUID()}`;
+      trigger.setAttribute('aria-controls', panel.id);
+      trigger.addEventListener('click', event => {
+        this.click(event);
       });
-      c.addEventListener('keydown', a => {
-        const c = a.key;
-        if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(c)) {
-          return;
-        }
-        a.preventDefault();
-        const d = [...b].indexOf(document.activeElement);
-        const e = b.length;
-        const f = b[c === 'ArrowUp' ? d - 1 < 0 ? e - 1 : d - 1 : c === 'ArrowDown' ? (d + 1) % e : c === 'Home' ? 0 : e - 1];
-        f.focus();
+      trigger.addEventListener('keydown', event => {
+        this.keydown(event);
       });
-      d.addEventListener('beforematch', a => {
-        f(document.querySelector(`[aria-controls="${a.target.id}"]`), true);
+      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${trigger.id}`.trim());
+      panel.setAttribute('role', 'region');
+      panel.addEventListener('beforematch', event => {
+        this.beforematch(event);
       });
     });
+  }
+  toggle(trigger, open) {
+    trigger.ariaExpanded = open;
+    trigger.dataset.accordionTransitioning = '';
+    const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
+    panel.hidden = false;
+    const height = `${panel.scrollHeight}px`;
+    panel.addEventListener('transitionend', function once(event) {
+      if (event.propertyName !== 'max-height') {
+        return;
+      }
+      delete trigger.dataset.accordionTransitioning;
+      if (!open) {
+        panel.hidden = 'until-found';
+      }
+      panel.style.maxHeight = panel.style.overflow = '';
+      this.removeEventListener('transitionend', once);
+    });
+    panel.style.maxHeight = open ? 0 : height;
+    panel.style.overflow = 'clip';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        panel.style.maxHeight = open ? height : 0;
+      });
+    });
+    const name = trigger.dataset.accordionName;
+    if (open && name) {
+      [...document.querySelectorAll(`[aria-expanded="true"][data-accordion-name="${name}"]`)]
+        .filter(t => t !== trigger)
+        .forEach(trigger => {
+          this.toggle(trigger, false);
+        });
+    }
+  }
+  click(event) {
+    event.preventDefault();
+    if (this.element.querySelector('[data-accordion-transitioning]')) {
+      return;
+    }
+    this.toggle(event.currentTarget, event.currentTarget.ariaExpanded !== 'true');
+  }
+  keydown(event) {
+    const key = event.key;
+    if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
+      return;
+    }
+    event.preventDefault();
+    const index = [...this.triggers].indexOf(document.activeElement);
+    const length = this.triggers.length;
+    this.triggers[key === 'ArrowUp' ? index - 1 < 0 ? length - 1 : index - 1 : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
+  }
+  beforematch(event) {
+    this.toggle(document.querySelector(`[aria-controls="${event.currentTarget.id}"]`), true);
   }
 }
 

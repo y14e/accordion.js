@@ -1,5 +1,5 @@
 export function getUUID() {
-  if (crypto.randomUUID === 'function') {
+  if (typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
   const a = URL.createObjectURL(new Blob()).slice(-36);

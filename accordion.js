@@ -5,24 +5,28 @@ class Accordion {
     this.element = element;
     const NOT_NESTED = ':not(:scope [data-accordion-header] + * *)';
     this.triggers = this.element.querySelectorAll(`[data-accordion-trigger]${NOT_NESTED}`);
-    this.triggers
-      .forEach(trigger => {
-        trigger.id = trigger.id || `accordion-trigger-${getUUID()}`;
-        const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
-        panel.id = panel.id || `accordion-panel-${getUUID()}`;
-        trigger.setAttribute('aria-controls', panel.id);
-        trigger.addEventListener('click', event => {
-          this.click(event);
-        });
-        trigger.addEventListener('keydown', event => {
-          this.keydown(event);
-        });
-        panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${trigger.id}`.trim());
-        panel.setAttribute('role', 'region');
-        panel.addEventListener('beforematch', event => {
-          this.beforematch(event);
-        });
+    this.panels = this.element.querySelectorAll(`[data-accordion-header] + *${NOT_NESTED}`);
+    this.initialize();
+  }
+  initialize() {
+    this.triggers.forEach((trigger, index) => {
+      trigger.id = trigger.id || `accordion-trigger-${getUUID()}`;
+      trigger.setAttribute('aria-controls', this.panels[index].id);
+      trigger.addEventListener('click', event => {
+        this.click(event);
       });
+      trigger.addEventListener('keydown', event => {
+        this.keydown(event);
+      });
+    });
+    this.panels.forEach((panel, index) => {
+      panel.id = panel.id || `accordion-panel-${getUUID()}`;
+      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[index].id}`.trim());
+      panel.setAttribute('role', 'region');
+      panel.addEventListener('beforematch', event => {
+        this.beforematch(event);
+      });
+    });
   }
   toggle(trigger, open) {
     trigger.dataset.accordionTransitioning = '';
@@ -72,7 +76,15 @@ class Accordion {
     event.preventDefault();
     const index = [...this.triggers].indexOf(document.activeElement);
     const length = this.triggers.length;
-    this.triggers[key === 'ArrowUp' ? index - 1 < 0 ? length - 1 : index - 1 : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
+    this.triggers[
+      key === 'ArrowUp' ?
+        index - 1 < 0 ?
+          length - 1
+        : index - 1
+      : key === 'ArrowDown' ? (index + 1) % length
+      : key === 'Home' ? 0
+      : length - 1
+    ].focus();
   }
   beforematch(event) {
     this.toggle(document.querySelector(`[aria-controls="${event.currentTarget.id}"]`), true);

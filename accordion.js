@@ -7,7 +7,7 @@ class Accordion {
     this.triggers = this.element.querySelectorAll(`[data-accordion-trigger]${NOT_NESTED}`);
     this.triggers
       .forEach(trigger => {
-        trigger.id = trigger.id || 'accordion-trigger-' + getUUID();
+        trigger.id = trigger.id || `accordion-trigger-${getUUID()}`;
         const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
         panel.id = panel.id || `accordion-panel-${getUUID()}`;
         trigger.setAttribute('aria-controls', panel.id);

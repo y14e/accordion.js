@@ -25,6 +25,15 @@ class Accordion {
       });
   }
   toggle(trigger, open) {
+    trigger.dataset.accordionTransitioning = '';
+    const name = trigger.dataset.accordionName;
+    if (name) {
+      const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
+      if (open && opened && opened !== trigger) {
+        this.toggle(opened, false);
+      }
+    }
+    trigger.ariaExpanded = open;
     const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
@@ -39,8 +48,6 @@ class Accordion {
       panel.style.maxHeight = panel.style.overflow = '';
       this.removeEventListener('transitionend', once);
     });
-    trigger.ariaExpanded = open;
-    trigger.dataset.accordionTransitioning = '';
     panel.style.maxHeight = open ? 0 : height;
     panel.style.overflow = 'clip';
     requestAnimationFrame(() => {
@@ -48,14 +55,6 @@ class Accordion {
         panel.style.maxHeight = open ? height : 0;
       });
     });
-    const name = trigger.dataset.accordionName;
-    if (open && name) {
-      [...document.querySelectorAll(`[aria-expanded="true"][data-accordion-name="${name}"]`)]
-        .filter(opened => opened !== trigger)
-        .forEach(trigger => {
-          this.toggle(trigger, false);
-        });
-    }
   }
   click(event) {
     event.preventDefault();

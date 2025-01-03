@@ -7,4 +7,4 @@ function getUUID() {
   return uuid;
 }
 
-export { getUUID };
+export default getUUID;

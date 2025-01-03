@@ -1,4 +1,4 @@
-export function getUUID() {
+function getUUID() {
   if (typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
@@ -6,3 +6,5 @@ export function getUUID() {
   URL.revokeObjectURL(uuid);
   return uuid;
 }
+
+export default getUUID;

@@ -76,15 +76,7 @@ class Accordion {
     event.preventDefault();
     const index = [...this.triggers].indexOf(document.activeElement);
     const length = this.triggers.length;
-    this.triggers[
-      key === 'ArrowUp' ?
-        index - 1 < 0 ?
-          length - 1
-        : index - 1
-      : key === 'ArrowDown' ? (index + 1) % length
-      : key === 'Home' ? 0
-      : length - 1
-    ].focus();
+    this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }
   beforematch(event) {
     this.toggle(document.querySelector(`[aria-controls="${event.currentTarget.id}"]`), true);

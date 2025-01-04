@@ -1,5 +1,3 @@
-import { getUUID } from './uuid.js';
-
 class Accordion {
   constructor(element) {
     this.element = element;
@@ -9,8 +7,11 @@ class Accordion {
     this.initialize();
   }
   initialize() {
+    const id = () => {
+      return Math.random().toString(16).slice(2, 8).padEnd(6, '0');
+    };
     this.triggers.forEach((trigger, index) => {
-      trigger.id = trigger.id || `accordion-trigger-${getUUID()}`;
+      trigger.id = trigger.id || `accordion-trigger-${id()}`;
       trigger.setAttribute('aria-controls', this.panels[index].id);
       trigger.addEventListener('click', event => {
         this.click(event);
@@ -20,7 +21,7 @@ class Accordion {
       });
     });
     this.panels.forEach((panel, index) => {
-      panel.id = panel.id || `accordion-panel-${getUUID()}`;
+      panel.id = panel.id || `accordion-panel-${id()}`;
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[index].id}`.trim());
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => {

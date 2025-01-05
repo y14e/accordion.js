@@ -10,9 +10,9 @@ class Accordion {
     const id = () => {
       return Math.random().toString(16).slice(2, 8).padEnd(6, '0');
     };
-    this.triggers.forEach((trigger, index) => {
+    this.triggers.forEach((trigger, i) => {
       trigger.id = trigger.id || `accordion-trigger-${id()}`;
-      trigger.setAttribute('aria-controls', this.panels[index].id);
+      trigger.setAttribute('aria-controls', this.panels[i].id);
       trigger.addEventListener('click', event => {
         this.click(event);
       });
@@ -20,9 +20,9 @@ class Accordion {
         this.keydown(event);
       });
     });
-    this.panels.forEach((panel, index) => {
+    this.panels.forEach((panel, i) => {
       panel.id = panel.id || `accordion-panel-${id()}`;
-      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[index].id}`.trim());
+      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => {
         this.beforematch(event);

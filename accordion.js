@@ -1,9 +1,17 @@
 class Accordion {
-  constructor(element) {
+  constructor(element, options) {
     this.element = element;
-    const NOT_NESTED = ':not(:scope [data-accordion-header] + * *)';
-    this.triggers = this.element.querySelectorAll(`[data-accordion-trigger]${NOT_NESTED}`);
-    this.panels = this.element.querySelectorAll(`[data-accordion-header] + *${NOT_NESTED}`);
+    this.options = {
+      selector: {
+        header: '[data-accordion-header]',
+        trigger: '[data-accordion-trigger]',
+        panel: '[data-accordion-header] + *',
+        ...options?.selector,
+      },
+    };
+    const NOT_NESTED = `:not(:scope ${this.options.selector.panel} *)`;
+    this.triggers = this.element.querySelectorAll(`${this.options.selector.trigger}${NOT_NESTED}`);
+    this.panels = this.element.querySelectorAll(`${this.options.selector.panel}${NOT_NESTED}`);
     this.initialize();
   }
   initialize() {
@@ -39,7 +47,7 @@ class Accordion {
       }
     }
     trigger.ariaExpanded = open;
-    const panel = trigger.closest('[data-accordion-header]').nextElementSibling;
+    const panel = trigger.closest(`${this.options.selector.header}`).nextElementSibling;
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
     panel.addEventListener('transitionend', function once(event) {

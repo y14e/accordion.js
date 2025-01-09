@@ -21,6 +21,7 @@ class Accordion {
     this.triggers.forEach((trigger, i) => {
       trigger.id = trigger.id || `accordion-trigger-${id()}`;
       trigger.setAttribute('aria-controls', this.panels[i].id);
+      trigger.tabIndex = 0;
       trigger.addEventListener('click', event => {
         this.click(event);
       });
@@ -79,11 +80,16 @@ class Accordion {
   }
   keydown(event) {
     const { key } = event;
-    if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
+    if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
     }
     event.preventDefault();
-    const index = [...this.triggers].indexOf(document.activeElement);
+    const active = document.activeElement;
+    if ([' ', 'Enter'].includes(key)) {
+      active.click();
+      return;
+    }
+    const index = [...this.triggers].indexOf(active);
     const length = this.triggers.length;
     this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }

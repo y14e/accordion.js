@@ -20,7 +20,7 @@ class Accordion {
     };
     this.triggers.forEach((trigger, i) => {
       trigger.id = trigger.id || `accordion-trigger-${id()}`;
-      trigger.setAttribute('aria-controls', this.panels[i].id);
+      trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id()}`));
       trigger.tabIndex = 0;
       trigger.addEventListener('click', event => {
         this.click(event);
@@ -30,7 +30,6 @@ class Accordion {
       });
     });
     this.panels.forEach((panel, i) => {
-      panel.id = panel.id || `accordion-panel-${id()}`;
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => {

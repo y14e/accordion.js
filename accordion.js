@@ -47,7 +47,7 @@ class Accordion {
       }
     }
     trigger.ariaExpanded = open;
-    const panel = trigger.closest(`${this.options.selector.header}`).nextElementSibling;
+    const panel = document.getElementById(trigger.getAttribute('aria-controls'));
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
     panel.addEventListener('transitionend', function once(event) {

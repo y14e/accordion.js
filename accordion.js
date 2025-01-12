@@ -22,18 +22,18 @@ class Accordion {
       trigger.id ||= `accordion-trigger-${id()}`;
       trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id()}`));
       trigger.tabIndex = 0;
-      trigger.addEventListener('click', event => {
-        this.click(event);
+      trigger.addEventListener('click', e => {
+        this.click(e);
       });
-      trigger.addEventListener('keydown', event => {
-        this.keydown(event);
+      trigger.addEventListener('keydown', e => {
+        this.keydown(e);
       });
     });
     this.panels.forEach((panel, i) => {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
       panel.setAttribute('role', 'region');
-      panel.addEventListener('beforematch', event => {
-        this.beforematch(event);
+      panel.addEventListener('beforematch', e => {
+        this.beforematch(e);
       });
     });
   }
@@ -50,8 +50,8 @@ class Accordion {
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
-    panel.addEventListener('transitionend', function once(event) {
-      if (event.propertyName !== 'max-height') {
+    panel.addEventListener('transitionend', function once(e) {
+      if (e.propertyName !== 'max-height') {
         return;
       }
       delete trigger.dataset.accordionTransitioning;
@@ -69,20 +69,20 @@ class Accordion {
       });
     });
   }
-  click(event) {
-    event.preventDefault();
+  click(e) {
+    e.preventDefault();
     if (this.element.querySelector('[data-accordion-transitioning]')) {
       return;
     }
-    const trigger = event.currentTarget;
+    const trigger = e.currentTarget;
     this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
-  keydown(event) {
-    const { key } = event;
+  keydown(e) {
+    const { key } = e;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
     }
-    event.preventDefault();
+    e.preventDefault();
     const active = document.activeElement;
     if ([' ', 'Enter'].includes(key)) {
       active.click();
@@ -92,8 +92,8 @@ class Accordion {
     const length = this.triggers.length;
     this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }
-  beforematch(event) {
-    this.toggle(document.querySelector(`[aria-controls="${event.currentTarget.id}"]`), true);
+  beforematch(e) {
+    this.toggle(document.querySelector(`[aria-controls="${e.currentTarget.id}"]`), true);
   }
 }
 

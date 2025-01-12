@@ -16,7 +16,7 @@ class Accordion {
   }
   initialize() {
     const id = () => {
-      return Math.random().toString(16).slice(2, 8).padEnd(6, '0');
+      return Math.random().toString(36).slice(-8);
     };
     this.triggers.forEach((trigger, i) => {
       trigger.id ||= `accordion-trigger-${id()}`;

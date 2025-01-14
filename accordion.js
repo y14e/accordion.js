@@ -23,17 +23,17 @@ class Accordion {
       trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id()}`));
       trigger.tabIndex = 0;
       trigger.addEventListener('click', e => {
-        this.click(e);
+        this.handleClick(e);
       });
       trigger.addEventListener('keydown', e => {
-        this.keydown(e);
+        this.handleKeyDown(e);
       });
     });
     this.panels.forEach((panel, i) => {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', e => {
-        this.beforematch(e);
+        this.handleBeforeMatch(e);
       });
     });
   }
@@ -69,7 +69,7 @@ class Accordion {
       });
     });
   }
-  click(e) {
+  handleClick(e) {
     e.preventDefault();
     if (this.element.querySelector('[data-accordion-transitioning]')) {
       return;
@@ -77,7 +77,7 @@ class Accordion {
     const trigger = e.currentTarget;
     this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
-  keydown(e) {
+  handleKeyDown(e) {
     const { key } = e;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
@@ -92,7 +92,7 @@ class Accordion {
     const length = this.triggers.length;
     this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }
-  beforematch(e) {
+  handleBeforeMatch(e) {
     this.toggle(document.querySelector(`[aria-controls="${e.currentTarget.id}"]`), true);
   }
 }

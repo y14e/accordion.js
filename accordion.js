@@ -37,16 +37,16 @@ class Accordion {
       });
     });
   }
-  toggle(trigger, open) {
+  toggle(trigger, isOpen) {
     trigger.dataset.accordionTransitioning = '';
     const name = trigger.dataset.accordionName;
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
-      if (open && opened && opened !== trigger) {
+      if (isOpen && opened && opened !== trigger) {
         this.toggle(opened, false);
       }
     }
-    trigger.ariaExpanded = open;
+    trigger.ariaExpanded = isOpen;
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
@@ -55,17 +55,17 @@ class Accordion {
         return;
       }
       delete trigger.dataset.accordionTransitioning;
-      if (!open) {
+      if (!isOpen) {
         panel.hidden = 'until-found';
       }
       panel.style.maxHeight = panel.style.overflow = '';
       this.removeEventListener('transitionend', once);
     });
-    panel.style.maxHeight = open ? 0 : height;
+    panel.style.maxHeight = isOpen ? 0 : height;
     panel.style.overflow = 'clip';
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        panel.style.maxHeight = open ? height : 0;
+        panel.style.maxHeight = isOpen ? height : 0;
       });
     });
   }

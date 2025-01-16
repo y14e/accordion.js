@@ -21,7 +21,7 @@ class Accordion {
     this.triggers.forEach((trigger, i) => {
       trigger.id ||= `accordion-trigger-${id()}`;
       trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id()}`));
-      trigger.setAttribute('tabindex', 0);
+      trigger.tabIndex = 0;
       trigger.addEventListener('click', e => {
         this.handleClick(e);
       });
@@ -31,32 +31,32 @@ class Accordion {
     });
     this.panels.forEach((panel, i) => {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
-      panel.setAttribute('role', 'region');
+      panel.role = 'region';
       panel.addEventListener('beforematch', e => {
         this.handleBeforeMatch(e);
       });
     });
   }
   toggle(trigger, isOpen) {
-    trigger.setAttribute('data-accordion-transitioning', '');
-    const name = trigger.getAttribute('data-accordion-name');
+    trigger.dataset.accordionTransitioning = '';
+    const name = trigger.dataset.accordionName;
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
       if (isOpen && opened && opened !== trigger) {
         this.toggle(opened, false);
       }
     }
-    trigger.setAttribute('aria-expanded', isOpen);
+    trigger.ariaExpanded = isOpen;
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));
-    panel.removeAttribute('hidden');
+    panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
     panel.addEventListener('transitionend', function once(e) {
       if (e.propertyName !== 'max-height') {
         return;
       }
-      trigger.removeAttribute('data-accordion-transitioning');
+      delete trigger.dataset.accordionTransitioning;
       if (!isOpen) {
-        panel.setAttribute('hidden', 'until-found');
+        panel.hidden = 'until-found';
       }
       panel.style.maxHeight = panel.style.overflow = '';
       this.removeEventListener('transitionend', once);
@@ -75,7 +75,7 @@ class Accordion {
       return;
     }
     const trigger = e.currentTarget;
-    this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
+    this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
   handleKeyDown(e) {
     const { key } = e;

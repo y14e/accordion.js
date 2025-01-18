@@ -14,6 +14,7 @@ class Accordion {
     this.panels = this.element.querySelectorAll(`${this.options.selector.panel}${NOT_NESTED}`);
     this.initialize();
   }
+
   initialize() {
     const id = () => {
       return Math.random().toString(36).slice(-8);
@@ -37,6 +38,7 @@ class Accordion {
       });
     });
   }
+
   toggle(trigger, isOpen) {
     trigger.dataset.accordionTransitioning = '';
     const name = trigger.dataset.accordionName;
@@ -69,6 +71,7 @@ class Accordion {
       });
     });
   }
+
   handleClick(e) {
     e.preventDefault();
     if (this.element.querySelector('[data-accordion-transitioning]')) {
@@ -77,6 +80,7 @@ class Accordion {
     const trigger = e.currentTarget;
     this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
+
   handleKeyDown(e) {
     const { key } = e;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
@@ -92,6 +96,7 @@ class Accordion {
     const length = this.triggers.length;
     this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }
+
   handleBeforeMatch(e) {
     this.toggle(document.querySelector(`[aria-controls="${e.currentTarget.id}"]`), true);
   }

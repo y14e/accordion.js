@@ -58,7 +58,7 @@ class Accordion {
       }
       delete trigger.dataset.accordionTransitioning;
       if (!isOpen) {
-        panel.hidden = 'until-found';
+        panel.setAttribute('hidden', 'until-found');
       }
       panel.style.maxHeight = panel.style.overflow = '';
       this.removeEventListener('transitionend', once);

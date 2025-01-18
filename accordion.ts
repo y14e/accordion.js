@@ -65,7 +65,7 @@ class Accordion {
     trigger.ariaExpanded = String(isOpen);
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
-    panel.addEventListener('transitionend', function once(e) {
+    panel.addEventListener('transitionend', function once(e: TransitionEvent): void {
       if (e.propertyName !== 'max-height') {
         return;
       }

@@ -29,7 +29,7 @@ class Accordion {
   }
 
   private initialize() {
-    const id = (): string => {
+    const id = () => {
       return Math.random().toString(36).slice(-8);
     };
     this.triggers.forEach((trigger, i) => {

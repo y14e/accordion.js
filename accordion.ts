@@ -28,7 +28,7 @@ class Accordion {
     this.initialize();
   }
 
-  private initialize(): void {
+  private initialize() {
     const id = (): string => {
       return Math.random().toString(36).slice(-8);
     };
@@ -52,7 +52,7 @@ class Accordion {
     });
   }
 
-  private toggle(trigger: HTMLElement, isOpen: boolean): void {
+  private toggle(trigger: HTMLElement, isOpen: boolean) {
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
     trigger.dataset.accordionTransitioning = '';
     const name = trigger.dataset.accordionName;
@@ -65,7 +65,7 @@ class Accordion {
     trigger.ariaExpanded = String(isOpen);
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
-    panel.addEventListener('transitionend', function once(e: TransitionEvent): void {
+    panel.addEventListener('transitionend', function once(e: TransitionEvent) {
       if (e.propertyName !== 'max-height') {
         return;
       }
@@ -85,7 +85,7 @@ class Accordion {
     });
   }
 
-  private handleClick(e: MouseEvent): void {
+  private handleClick(e: MouseEvent) {
     e.preventDefault();
     if (this.element.querySelector('[data-accordion-transitioning]')) {
       return;
@@ -94,7 +94,7 @@ class Accordion {
     this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
 
-  private handleKeyDown(e: KeyboardEvent): void {
+  private handleKeyDown(e: KeyboardEvent) {
     const { key } = e;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
@@ -110,7 +110,7 @@ class Accordion {
     this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }
 
-  private handleBeforeMatch(e: Event): void {
+  private handleBeforeMatch(e: Event) {
     this.toggle(document.querySelector(`[aria-controls="${(e.currentTarget as HTMLElement).id}"]`) as HTMLElement, true);
   }
 }

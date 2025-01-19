@@ -40,6 +40,7 @@ class Accordion {
   }
 
   toggle(trigger, isOpen) {
+    const panel = document.getElementById(trigger.getAttribute('aria-controls'));
     trigger.dataset.accordionTransitioning = '';
     const name = trigger.dataset.accordionName;
     if (name) {
@@ -48,8 +49,7 @@ class Accordion {
         this.toggle(opened, false);
       }
     }
-    trigger.ariaExpanded = isOpen;
-    const panel = document.getElementById(trigger.getAttribute('aria-controls'));
+    trigger.ariaExpanded = String(isOpen);
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
     panel.addEventListener('transitionend', function once(e) {
@@ -63,11 +63,11 @@ class Accordion {
       panel.style.maxHeight = panel.style.overflow = '';
       this.removeEventListener('transitionend', once);
     });
-    panel.style.maxHeight = isOpen ? 0 : height;
+    panel.style.maxHeight = isOpen ? '0' : height;
     panel.style.overflow = 'clip';
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        panel.style.maxHeight = isOpen ? height : 0;
+        panel.style.maxHeight = isOpen ? height : '0';
       });
     });
   }

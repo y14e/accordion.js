@@ -29,12 +29,12 @@ class Accordion {
   }
 
   private initialize() {
-    const id = () => {
+    const _id = () => {
       return Math.random().toString(36).slice(-8);
     };
     this.triggers.forEach((trigger, i) => {
-      trigger.id ||= `accordion-trigger-${id()}`;
-      trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id()}`));
+      trigger.id ||= `accordion-trigger-${_id()}`;
+      trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${_id()}`));
       trigger.tabIndex = 0;
       trigger.addEventListener('click', e => {
         this.handleClick(e);
@@ -65,7 +65,7 @@ class Accordion {
     trigger.ariaExpanded = String(isOpen);
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
-    panel.addEventListener('transitionend', function once(e: TransitionEvent) {
+    panel.addEventListener('transitionend', function _once(e: TransitionEvent) {
       if (e.propertyName !== 'max-height') {
         return;
       }
@@ -74,7 +74,7 @@ class Accordion {
         panel.setAttribute('hidden', 'until-found');
       }
       panel.style.maxHeight = panel.style.overflow = '';
-      this.removeEventListener('transitionend', once);
+      this.removeEventListener('transitionend', _once);
     });
     panel.style.maxHeight = isOpen ? '0' : height;
     panel.style.overflow = 'clip';

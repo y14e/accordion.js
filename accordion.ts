@@ -90,8 +90,7 @@ class Accordion {
     if (this.element.querySelector('[data-accordion-transitioning]')) {
       return;
     }
-    const trigger = e.currentTarget as HTMLElement;
-    this.toggle(trigger);
+    this.toggle(e.currentTarget as HTMLElement);
   }
 
   private handleKeyDown(e: KeyboardEvent) {

@@ -52,14 +52,14 @@ class Accordion {
     });
   }
 
-  private toggle(trigger: HTMLElement, isOpen: boolean) {
+  private state(trigger: HTMLElement, isOpen: boolean) {
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
     trigger.dataset.accordionTransitioning = '';
     const name = trigger.dataset.accordionName;
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
       if (isOpen && opened && opened !== trigger) {
-        this.toggle(opened, false);
+        this.close(opened);
       }
     }
     trigger.ariaExpanded = String(isOpen);
@@ -91,7 +91,7 @@ class Accordion {
       return;
     }
     const trigger = e.currentTarget as HTMLElement;
-    this.toggle(trigger, trigger.ariaExpanded !== 'true');
+    this.toggle(trigger);
   }
 
   private handleKeyDown(e: KeyboardEvent) {
@@ -111,7 +111,19 @@ class Accordion {
   }
 
   private handleBeforeMatch(e: Event) {
-    this.toggle(document.querySelector(`[aria-controls="${(e.currentTarget as HTMLElement).id}"]`) as HTMLElement, true);
+    this.open(document.querySelector(`[aria-controls="${(e.currentTarget as HTMLElement).id}"]`) as HTMLElement);
+  }
+
+  open(trigger: HTMLElement) {
+    this.state(trigger, true);
+  }
+
+  close(trigger: HTMLElement) {
+    this.state(trigger, false);
+  }
+
+  toggle(trigger: HTMLElement) {
+    this.state(trigger, trigger.ariaExpanded !== 'true');
   }
 }
 

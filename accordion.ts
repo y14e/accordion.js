@@ -36,18 +36,18 @@ class Accordion {
       trigger.id ||= `accordion-trigger-${generateId()}`;
       trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${generateId()}`));
       trigger.tabIndex = 0;
-      trigger.addEventListener('click', e => {
-        this.handleClick(e);
+      trigger.addEventListener('click', event => {
+        this.handleClick(event);
       });
-      trigger.addEventListener('keydown', e => {
-        this.handleKeyDown(e);
+      trigger.addEventListener('keydown', event => {
+        this.handleKeyDown(event);
       });
     });
     this.panels.forEach((panel, i) => {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
       panel.role = 'region';
-      panel.addEventListener('beforematch', e => {
-        this.handleBeforeMatch(e);
+      panel.addEventListener('beforematch', event => {
+        this.handleBeforeMatch(event);
       });
     });
   }
@@ -65,8 +65,8 @@ class Accordion {
     trigger.ariaExpanded = String(isOpen);
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
-    panel.addEventListener('transitionend', function handleTransitionEnd(e: TransitionEvent) {
-      if (e.propertyName !== 'max-height') {
+    panel.addEventListener('transitionend', function handleTransitionEnd(event: TransitionEvent) {
+      if (event.propertyName !== 'max-height') {
         return;
       }
       delete trigger.dataset.accordionTransitioning;
@@ -85,20 +85,20 @@ class Accordion {
     });
   }
 
-  private handleClick(e: MouseEvent) {
-    e.preventDefault();
+  private handleClick(event: MouseEvent) {
+    event.preventDefault();
     if (this.element.querySelector('[data-accordion-transitioning]')) {
       return;
     }
-    this.toggle(e.currentTarget as HTMLElement);
+    this.toggle(event.currentTarget as HTMLElement);
   }
 
-  private handleKeyDown(e: KeyboardEvent) {
-    const { key } = e;
+  private handleKeyDown(event: KeyboardEvent) {
+    const { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
     }
-    e.preventDefault();
+    event.preventDefault();
     const active = document.activeElement as HTMLElement;
     if ([' ', 'Enter'].includes(key)) {
       active.click();
@@ -109,8 +109,8 @@ class Accordion {
     this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }
 
-  private handleBeforeMatch(e: Event) {
-    this.open(document.querySelector(`[aria-controls="${(e.currentTarget as HTMLElement).id}"]`) as HTMLElement);
+  private handleBeforeMatch(event: Event) {
+    this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).id}"]`) as HTMLElement);
   }
 
   open(trigger: HTMLElement) {

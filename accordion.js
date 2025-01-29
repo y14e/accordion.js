@@ -40,7 +40,8 @@ class Accordion {
   }
 
   state(trigger, isOpen) {
-    trigger.dataset.accordionTransitioning = '';
+    const element = this.element;
+    element.dataset.accordionTransitioning = '';
     const name = trigger.dataset.accordionName;
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
@@ -56,11 +57,11 @@ class Accordion {
       if (event.propertyName !== 'max-height') {
         return;
       }
-      delete trigger.dataset.accordionTransitioning;
+      delete element.dataset.accordionTransitioning;
       if (!isOpen) {
-        panel.setAttribute('hidden', 'until-found');
+        this.setAttribute('hidden', 'until-found');
       }
-      panel.style.maxHeight = panel.style.overflow = '';
+      this.style.maxHeight = this.style.overflow = '';
       this.removeEventListener('transitionend', handleTransitionEnd);
     });
     panel.style.cssText += `
@@ -76,7 +77,7 @@ class Accordion {
 
   handleClick(event) {
     event.preventDefault();
-    if (this.element.querySelector('[data-accordion-transitioning]')) {
+    if (this.element.hasAttribute('data-accordion-transitioning')) {
       return;
     }
     this.toggle(event.currentTarget);

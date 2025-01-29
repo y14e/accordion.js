@@ -53,7 +53,6 @@ class Accordion {
   }
 
   private state(trigger: HTMLElement, isOpen: boolean) {
-    const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
     trigger.dataset.accordionTransitioning = '';
     const name = trigger.dataset.accordionName;
     if (name) {
@@ -63,6 +62,7 @@ class Accordion {
       }
     }
     trigger.ariaExpanded = String(isOpen);
+    const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
     panel.addEventListener('transitionend', function handleTransitionEnd(event: TransitionEvent) {
@@ -76,8 +76,10 @@ class Accordion {
       panel.style.maxHeight = panel.style.overflow = '';
       this.removeEventListener('transitionend', handleTransitionEnd);
     });
-    panel.style.maxHeight = isOpen ? '0' : height;
-    panel.style.overflow = 'clip';
+    panel.style.cssText += `
+      max-height: ${isOpen ? '0' : height};
+      overflow: clip;
+    `;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         panel.style.maxHeight = isOpen ? height : '0';

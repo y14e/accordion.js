@@ -4,6 +4,10 @@ type AccordionOptions = {
     trigger?: string;
     panel?: string;
   };
+  animation?: {
+    duration?: number;
+    easing?: string;
+  };
 };
 
 class Accordion {
@@ -20,6 +24,11 @@ class Accordion {
         trigger: '[data-accordion-trigger]',
         panel: '[data-accordion-header] + *',
         ...options?.selector,
+      },
+      animation: {
+        duration: 300,
+        easing: 'ease',
+        ...options?.animation,
       },
     };
     const NOT_NESTED = `:not(:scope ${this.options.selector.panel} *)`;
@@ -66,25 +75,13 @@ class Accordion {
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
-    panel.addEventListener('transitionend', function handleTransitionEnd(event: TransitionEvent) {
-      if (event.propertyName !== 'max-height') {
-        return;
-      }
+    panel.style.overflow = 'clip';
+    panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       delete element.dataset.accordionTransitioning;
       if (!isOpen) {
-        this.setAttribute('hidden', 'until-found');
+        panel.setAttribute('hidden', 'until-found');
       }
-      this.style.maxHeight = this.style.overflow = '';
-      this.removeEventListener('transitionend', handleTransitionEnd);
-    });
-    panel.style.cssText += `
-      max-height: ${isOpen ? '0' : height};
-      overflow: clip;
-    `;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        panel.style.maxHeight = isOpen ? height : '0';
-      });
+      panel.style.maxHeight = panel.style.overflow = '';
     });
   }
 

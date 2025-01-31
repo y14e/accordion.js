@@ -46,7 +46,7 @@ class Accordion {
 
   state(trigger, isOpen) {
     const element = this.element;
-    element.dataset.accordionTransitioning = '';
+    element.dataset.accordionAnimating = '';
     const name = trigger.dataset.accordionName;
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
@@ -60,7 +60,7 @@ class Accordion {
     const height = `${panel.scrollHeight}px`;
     panel.style.overflow = 'clip';
     panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
-      delete element.dataset.accordionTransitioning;
+      delete element.dataset.accordionAnimating;
       if (!isOpen) {
         panel.setAttribute('hidden', 'until-found');
       }
@@ -70,7 +70,7 @@ class Accordion {
 
   handleClick(event) {
     event.preventDefault();
-    if (this.element.hasAttribute('data-accordion-transitioning')) {
+    if (this.element.hasAttribute('data-accordion-animating')) {
       return;
     }
     this.toggle(event.currentTarget);

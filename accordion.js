@@ -15,7 +15,7 @@ class Accordion {
       },
     };
     const NOT_NESTED = `:not(:scope ${this.options.selector.panel} *)`;
-    this.triggers = this.element.querySelectorAll(`${this.options.selector.trigger}${NOT_NESTED}`);
+    this.triggers = this.element.querySelectorAll(`${this.options.selector.trigger}${NOT_NESTED}:not(:disabled)`);
     this.panels = this.element.querySelectorAll(`${this.options.selector.panel}${NOT_NESTED}`);
     this.initialize();
   }

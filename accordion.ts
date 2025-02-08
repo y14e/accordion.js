@@ -38,12 +38,10 @@ class Accordion {
   }
 
   private initialize() {
-    const generateId = () => {
-      return Math.random().toString(36).slice(-8);
-    };
     this.triggers.forEach((trigger, i) => {
-      trigger.id ||= `accordion-trigger-${generateId()}`;
-      trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${generateId()}`));
+      const id = Math.random().toString(36).slice(-8);
+      trigger.id ||= `accordion-trigger-${id}`;
+      trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id}`));
       trigger.tabIndex = 0;
       trigger.addEventListener('click', event => {
         this.handleClick(event);

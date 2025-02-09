@@ -43,19 +43,13 @@ class Accordion {
       trigger.id ||= `accordion-trigger-${id}`;
       trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id}`));
       trigger.tabIndex = 0;
-      trigger.addEventListener('click', event => {
-        this.handleClick(event);
-      });
-      trigger.addEventListener('keydown', event => {
-        this.handleKeyDown(event);
-      });
+      trigger.addEventListener('click', event => this.handleClick(event));
+      trigger.addEventListener('keydown', event => this.handleKeyDown(event));
     });
     this.panels.forEach((panel, i) => {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
       panel.role = 'region';
-      panel.addEventListener('beforematch', event => {
-        this.handleBeforeMatch(event);
-      });
+      panel.addEventListener('beforematch', event => this.handleBeforeMatch(event));
     });
   }
 
@@ -65,9 +59,7 @@ class Accordion {
     const name = trigger.dataset.accordionName;
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
-      if (isOpen && opened && opened !== trigger) {
-        this.close(opened);
-      }
+      if (isOpen && opened && opened !== trigger) this.close(opened);
     }
     trigger.ariaExpanded = String(isOpen);
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
@@ -76,26 +68,20 @@ class Accordion {
     panel.style.overflow = 'clip';
     panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       delete element.dataset.accordionAnimating;
-      if (!isOpen) {
-        panel.setAttribute('hidden', 'until-found');
-      }
+      if (!isOpen) panel.setAttribute('hidden', 'until-found');
       panel.style.maxHeight = panel.style.overflow = '';
     });
   }
 
   private handleClick(event: MouseEvent) {
     event.preventDefault();
-    if (this.element.hasAttribute('data-accordion-animating')) {
-      return;
-    }
+    if (this.element.hasAttribute('data-accordion-animating')) return;
     this.toggle(event.currentTarget as HTMLElement);
   }
 
   private handleKeyDown(event: KeyboardEvent) {
     const { key } = event;
-    if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
-      return;
-    }
+    if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
     const active = document.activeElement as HTMLElement;
     if ([' ', 'Enter'].includes(key)) {

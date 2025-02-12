@@ -65,11 +65,14 @@ class Accordion {
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
     panel.hidden = false;
     const height = `${panel.scrollHeight}px`;
-    panel.style.overflow = 'clip';
+    panel.style.cssText += `
+      overflow: clip;
+      will-change: max-height;
+    `;
     panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       delete element.dataset.accordionAnimating;
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
-      panel.style.maxHeight = panel.style.overflow = '';
+      panel.style.maxHeight = panel.style.overflow = panel.style.willChange = '';
     });
   }
 

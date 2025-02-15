@@ -56,7 +56,7 @@ class Accordion {
     });
   }
 
-  private state(trigger: HTMLElement, isOpen: boolean): void {
+  private toggle(trigger: HTMLElement, isOpen: boolean): void {
     const element = this.element;
     element.dataset.accordionAnimating = '';
     const name = trigger.dataset.accordionName;
@@ -82,7 +82,8 @@ class Accordion {
   private handleClick(event: MouseEvent): void {
     event.preventDefault();
     if (this.element.hasAttribute('data-accordion-animating')) return;
-    this.toggle(event.currentTarget as HTMLElement);
+    const trigger = event.currentTarget as HTMLElement;
+    this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
@@ -104,15 +105,11 @@ class Accordion {
   }
 
   open(trigger: HTMLElement): void {
-    this.state(trigger, true);
+    this.toggle(trigger, true);
   }
 
   close(trigger: HTMLElement): void {
-    this.state(trigger, false);
-  }
-
-  toggle(trigger: HTMLElement): void {
-    this.state(trigger, trigger.ariaExpanded !== 'true');
+    this.toggle(trigger, false);
   }
 }
 

@@ -39,7 +39,7 @@ class Accordion {
     });
   }
 
-  state(trigger, isOpen) {
+  toggle(trigger, isOpen) {
     const element = this.element;
     element.dataset.accordionAnimating = '';
     const name = trigger.dataset.accordionName;
@@ -65,7 +65,8 @@ class Accordion {
   handleClick(event) {
     event.preventDefault();
     if (this.element.hasAttribute('data-accordion-animating')) return;
-    this.toggle(event.currentTarget);
+    const trigger = event.currentTarget;
+    this.toggle(trigger, trigger.ariaExpanded !== 'true');
   }
 
   handleKeyDown(event) {
@@ -87,15 +88,11 @@ class Accordion {
   }
 
   open(trigger) {
-    this.state(trigger, true);
+    this.toggle(trigger, true);
   }
 
   close(trigger) {
-    this.state(trigger, false);
-  }
-
-  toggle(trigger) {
-    this.state(trigger, trigger.ariaExpanded !== 'true');
+    this.toggle(trigger, false);
   }
 }
 

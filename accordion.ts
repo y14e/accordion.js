@@ -51,6 +51,7 @@ class Accordion {
     });
     this.panels.forEach((panel, i) => {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
+      if (panel.hidden) panel.setAttribute('hidden', 'until-found');
       panel.role = 'region';
       panel.addEventListener('beforematch', event => this.handleBeforeMatch(event));
     });

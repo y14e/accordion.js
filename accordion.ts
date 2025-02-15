@@ -40,7 +40,7 @@ class Accordion {
     this.initialize();
   }
 
-  private initialize() {
+  private initialize(): void {
     this.triggers.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
       trigger.id ||= `accordion-trigger-${id}`;
@@ -56,7 +56,7 @@ class Accordion {
     });
   }
 
-  private state(trigger: HTMLElement, isOpen: boolean) {
+  private state(trigger: HTMLElement, isOpen: boolean): void {
     const element = this.element;
     element.dataset.accordionAnimating = '';
     const name = trigger.dataset.accordionName;
@@ -79,13 +79,13 @@ class Accordion {
     });
   }
 
-  private handleClick(event: MouseEvent) {
+  private handleClick(event: MouseEvent): void {
     event.preventDefault();
     if (this.element.hasAttribute('data-accordion-animating')) return;
     this.toggle(event.currentTarget as HTMLElement);
   }
 
-  private handleKeyDown(event: KeyboardEvent) {
+  private handleKeyDown(event: KeyboardEvent): void {
     const { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
@@ -103,15 +103,15 @@ class Accordion {
     this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).id}"]`) as HTMLElement);
   }
 
-  open(trigger: HTMLElement) {
+  open(trigger: HTMLElement): void {
     this.state(trigger, true);
   }
 
-  close(trigger: HTMLElement) {
+  close(trigger: HTMLElement): void {
     this.state(trigger, false);
   }
 
-  toggle(trigger: HTMLElement) {
+  toggle(trigger: HTMLElement): void {
     this.state(trigger, trigger.ariaExpanded !== 'true');
   }
 }

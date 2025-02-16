@@ -43,16 +43,18 @@ class Accordion {
   private initialize(): void {
     this.triggers.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
-      trigger.id ||= `accordion-trigger-${id}`;
-      trigger.setAttribute('aria-controls', (this.panels[i].id ||= `accordion-panel-${id}`));
-      trigger.tabIndex = 0;
+      trigger.setAttribute('id', trigger.getAttribute('id') || `accordion-trigger-${id}`);
+      const panel = this.panels[i];
+      panel.setAttribute('id', panel.getAttribute('id') || `accordion-panel-${id}`);
+      trigger.setAttribute('aria-controls', panel.getAttribute('id')!);
+      trigger.setAttribute('tabindex', '0');
       trigger.addEventListener('click', event => this.handleClick(event));
       trigger.addEventListener('keydown', event => this.handleKeyDown(event));
     });
     this.panels.forEach((panel, i) => {
-      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].id}`.trim());
-      if (panel.hidden) panel.setAttribute('hidden', 'until-found');
-      panel.role = 'region';
+      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].getAttribute('id')}`.trim());
+      if (panel.hasAttribute('hidden')) panel.setAttribute('hidden', 'until-found');
+      panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => this.handleBeforeMatch(event));
     });
   }
@@ -65,18 +67,16 @@ class Accordion {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
       if (isOpen && opened && opened !== trigger) this.close(opened);
     }
-    trigger.ariaExpanded = String(isOpen);
+    trigger.setAttribute('aria-expanded', String(isOpen));
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
-    panel.hidden = false;
+    panel.removeAttribute('hidden');
     const height = `${panel.scrollHeight}px`;
-    panel.style.cssText += `
-      overflow: clip;
-      will-change: ${[...new Set(window.getComputedStyle(panel).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(',')};
-    `;
+    panel.style.setProperty('overflow', 'clip');
+    panel.style.setProperty('will-change', [...new Set(window.getComputedStyle(panel).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
     panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       element.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
-      panel.style.maxHeight = panel.style.overflow = panel.style.willChange = '';
+      ['max-height', 'overflow', 'will-change'].forEach(property => panel.style.removeProperty(property));
     });
   }
 
@@ -84,7 +84,7 @@ class Accordion {
     event.preventDefault();
     if (this.element.hasAttribute('data-accordion-animating')) return;
     const trigger = event.currentTarget as HTMLElement;
-    this.toggle(trigger, trigger.ariaExpanded !== 'true');
+    this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
@@ -102,7 +102,7 @@ class Accordion {
   }
 
   private handleBeforeMatch(event: Event): void {
-    this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).id}"]`) as HTMLElement);
+    this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement);
   }
 
   open(trigger: HTMLElement): void {

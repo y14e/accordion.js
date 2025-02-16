@@ -42,8 +42,8 @@ class Accordion {
 
   toggle(trigger, isOpen) {
     const element = this.element;
-    element.dataset.accordionAnimating = '';
-    const name = trigger.dataset.accordionName;
+    element.setAttribute('data-accordion-animating', '');
+    const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
       if (isOpen && opened && opened !== trigger) this.close(opened);
@@ -57,7 +57,7 @@ class Accordion {
       will-change: max-height;
     `;
     panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
-      delete element.dataset.accordionAnimating;
+      element.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       panel.style.maxHeight = panel.style.overflow = panel.style.willChange = '';
     });

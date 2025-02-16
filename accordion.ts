@@ -101,7 +101,7 @@ class Accordion {
     this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
   }
 
-  private handleBeforeMatch(event: Event) {
+  private handleBeforeMatch(event: Event): void {
     this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).id}"]`) as HTMLElement);
   }
 

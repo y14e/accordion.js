@@ -1,4 +1,4 @@
-type AccordionOptions = {
+type Props = {
   selector: {
     header: string;
     trigger: string;
@@ -12,29 +12,29 @@ type AccordionOptions = {
 
 class Accordion {
   element: HTMLElement;
-  options: Required<AccordionOptions>;
+  props: Props;
   triggers: NodeListOf<HTMLElement>;
   panels: NodeListOf<HTMLElement>;
 
-  constructor(element: HTMLElement, options?: Partial<AccordionOptions>) {
+  constructor(element: HTMLElement, props?: Partial<Props>) {
     this.element = element;
-    this.options = {
+    this.props = {
       selector: {
         header: '[data-accordion-header]',
         trigger: '[data-accordion-trigger]',
         panel: '[data-accordion-header] + *',
-        ...options?.selector,
+        ...props?.selector,
       },
       animation: {
         duration: 300,
         easing: 'ease',
-        ...options?.animation,
+        ...props?.animation,
       },
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.options.animation.duration = 0;
-    const NOT_NESTED = `:not(:scope ${this.options.selector.panel} *)`;
-    this.triggers = this.element.querySelectorAll(`${this.options.selector.trigger}${NOT_NESTED}:not(:disabled)`);
-    this.panels = this.element.querySelectorAll(`${this.options.selector.panel}${NOT_NESTED}`);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.props.animation.duration = 0;
+    const NOT_NESTED = `:not(:scope ${this.props.selector.panel} *)`;
+    this.triggers = this.element.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}:not(:disabled)`);
+    this.panels = this.element.querySelectorAll(`${this.props.selector.panel}${NOT_NESTED}`);
     this.initialize();
   }
 
@@ -71,7 +71,7 @@ class Accordion {
     const height = `${panel.scrollHeight}px`;
     panel.style.setProperty('overflow', 'clip');
     panel.style.setProperty('will-change', [...new Set(window.getComputedStyle(panel).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
-    panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
+    panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.props.animation.duration, easing: this.props.animation.easing }).addEventListener('finish', () => {
       element.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['max-height', 'overflow', 'will-change'].forEach(name => panel.style.removeProperty(name));

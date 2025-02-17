@@ -59,7 +59,7 @@ class Accordion {
     panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       element.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
-      ['max-height', 'overflow', 'will-change'].forEach(property => panel.style.removeProperty(property));
+      ['max-height', 'overflow', 'will-change'].forEach(name => panel.style.removeProperty(name));
     });
   }
 

@@ -1,12 +1,12 @@
 type AccordionOptions = {
-  selector?: {
-    header?: string;
-    trigger?: string;
-    panel?: string;
+  selector: {
+    header: string;
+    trigger: string;
+    panel: string;
   };
-  animation?: {
-    duration?: number;
-    easing?: string;
+  animation: {
+    duration: number;
+    easing: string;
   };
 };
 
@@ -16,7 +16,7 @@ class Accordion {
   triggers: NodeListOf<HTMLElement>;
   panels: NodeListOf<HTMLElement>;
 
-  constructor(element: HTMLElement, options?: AccordionOptions) {
+  constructor(element: HTMLElement, options?: Partial<AccordionOptions>) {
     this.element = element;
     this.options = {
       selector: {

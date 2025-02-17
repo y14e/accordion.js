@@ -14,9 +14,7 @@ class Accordion {
         ...options?.animation,
       },
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      this.options.animation.duration = 0;
-    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.options.animation.duration = 0;
     const NOT_NESTED = `:not(:scope ${this.options.selector.panel} *)`;
     this.triggers = this.element.querySelectorAll(`${this.options.selector.trigger}${NOT_NESTED}:not(:disabled)`);
     this.panels = this.element.querySelectorAll(`${this.options.selector.panel}${NOT_NESTED}`);

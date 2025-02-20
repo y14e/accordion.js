@@ -18,6 +18,7 @@ class Accordion {
     const NOT_NESTED = `:not(:scope ${this.props.selector.panel} *)`;
     this.triggers = this.element.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}:not(:disabled)`);
     this.panels = this.element.querySelectorAll(`${this.props.selector.panel}${NOT_NESTED}`);
+    if (!this.triggers.length || !this.panels.length) return;
     this.initialize();
   }
 
@@ -73,13 +74,28 @@ class Accordion {
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
     const active = document.activeElement;
-    if ([' ', 'Enter'].includes(key)) {
-      active.click();
-      return;
-    }
-    const index = [...this.triggers].indexOf(active);
+    const position = [...this.triggers].indexOf(active);
     const length = this.triggers.length;
-    this.triggers[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
+    let index = position;
+    switch (key) {
+      case ' ':
+      case 'Enter':
+        active.click();
+        return;
+      case 'ArrowUp':
+        index = (position - 1 + length) % length;
+        break;
+      case 'ArrowDown':
+        index = (position + 1) % length;
+        break;
+      case 'Home':
+        index = 0;
+        break;
+      case 'End':
+        index = length - 1;
+        break;
+    }
+    this.triggers[index].focus();
   }
 
   handleBeforeMatch(event) {

@@ -39,6 +39,7 @@ class Accordion {
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => this.handleBeforeMatch(event));
     });
+    this.element.setAttribute('data-accordion-initialized', '');
   }
 
   toggle(trigger, isOpen) {

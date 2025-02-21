@@ -3,6 +3,7 @@ class Accordion {
     this.element = element;
     this.props = {
       selector: {
+        item: ':has(> [data-accordion-header])',
         header: '[data-accordion-header]',
         trigger: '[data-accordion-trigger]',
         panel: '[data-accordion-header] + *',
@@ -16,9 +17,11 @@ class Accordion {
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.props.animation.duration = 0;
     const NOT_NESTED = `:not(:scope ${this.props.selector.panel} *)`;
+    this.items = this.element.querySelectorAll(`${this.props.selector.item}${NOT_NESTED}`);
+    this.headers = this.element.querySelectorAll(`${this.props.selector.header}${NOT_NESTED}`);
     this.triggers = this.element.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}:not(:disabled)`);
     this.panels = this.element.querySelectorAll(`${this.props.selector.panel}${NOT_NESTED}`);
-    if (!this.triggers.length || !this.panels.length) return;
+    if (!this.items.length || !this.headers.length || !this.triggers.length || !this.panels.length) return;
     this.initialize();
   }
 

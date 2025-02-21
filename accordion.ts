@@ -39,7 +39,7 @@ class Accordion {
     const NOT_NESTED = `:not(:scope ${this.props.selector.panel} *)`;
     this.items = this.element.querySelectorAll(`${this.props.selector.item}${NOT_NESTED}`);
     this.headers = this.element.querySelectorAll(`${this.props.selector.header}${NOT_NESTED}`);
-    this.triggers = this.element.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}:not(:disabled)`);
+    this.triggers = this.element.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}`);
     this.panels = this.element.querySelectorAll(`${this.props.selector.panel}${NOT_NESTED}`);
     if (!this.items.length || !this.headers.length || !this.triggers.length || !this.panels.length) return;
     this.initialize();
@@ -97,9 +97,10 @@ class Accordion {
     const { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
+    const triggers = [...this.triggers].filter(trigger => !trigger.hasAttribute('disabled'));
     const active = document.activeElement as HTMLElement;
-    const position = [...this.triggers].indexOf(active);
-    const length = this.triggers.length;
+    const position = triggers.indexOf(active);
+    const length = triggers.length;
     let index = position;
     switch (key) {
       case ' ':
@@ -119,7 +120,7 @@ class Accordion {
         index = length - 1;
         break;
     }
-    this.triggers[index].focus();
+    triggers[index].focus();
   }
 
   private handleBeforeMatch(event: Event): void {

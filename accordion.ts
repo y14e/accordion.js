@@ -97,30 +97,30 @@ class Accordion {
     const { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
-    const triggers = [...this.triggers].filter(trigger => !trigger.hasAttribute('disabled'));
+    const focusables = [...this.triggers].filter(trigger => !trigger.hasAttribute('disabled'));
     const active = document.activeElement as HTMLElement;
-    const position = triggers.indexOf(active);
-    const length = triggers.length;
-    let index = position;
+    const index = focusables.indexOf(active);
+    const length = focusables.length;
+    let newIndex = index;
     switch (key) {
       case ' ':
       case 'Enter':
         active.click();
         return;
       case 'ArrowUp':
-        index = (position - 1 + length) % length;
+        newIndex = (index - 1 + length) % length;
         break;
       case 'ArrowDown':
-        index = (position + 1) % length;
+        newIndex = (index + 1) % length;
         break;
       case 'Home':
-        index = 0;
+        newIndex = 0;
         break;
       case 'End':
-        index = length - 1;
+        newIndex = length - 1;
         break;
     }
-    triggers[index].focus();
+    focusables[newIndex].focus();
   }
 
   private handleBeforeMatch(event: Event): void {

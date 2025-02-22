@@ -12,15 +12,15 @@ type Props = {
 };
 
 class Accordion {
-  element: HTMLElement;
+  root: HTMLElement;
   props: Props;
   items: NodeListOf<HTMLElement>;
   headers: NodeListOf<HTMLElement>;
   triggers: NodeListOf<HTMLElement>;
   panels: NodeListOf<HTMLElement>;
 
-  constructor(element: HTMLElement, props?: Partial<Props>) {
-    this.element = element;
+  constructor(root: HTMLElement, props?: Partial<Props>) {
+    this.root = root;
     this.props = {
       selector: {
         item: ':has(> [data-accordion-header])',
@@ -37,10 +37,10 @@ class Accordion {
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.props.animation.duration = 0;
     const NOT_NESTED = `:not(:scope ${this.props.selector.panel} *)`;
-    this.items = this.element.querySelectorAll(`${this.props.selector.item}${NOT_NESTED}`);
-    this.headers = this.element.querySelectorAll(`${this.props.selector.header}${NOT_NESTED}`);
-    this.triggers = this.element.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}`);
-    this.panels = this.element.querySelectorAll(`${this.props.selector.panel}${NOT_NESTED}`);
+    this.items = this.root.querySelectorAll(`${this.props.selector.item}${NOT_NESTED}`);
+    this.headers = this.root.querySelectorAll(`${this.props.selector.header}${NOT_NESTED}`);
+    this.triggers = this.root.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}`);
+    this.panels = this.root.querySelectorAll(`${this.props.selector.panel}${NOT_NESTED}`);
     if (!this.items.length || !this.headers.length || !this.triggers.length || !this.panels.length) return;
     this.initialize();
   }
@@ -62,12 +62,12 @@ class Accordion {
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => this.handleBeforeMatch(event));
     });
-    this.element.setAttribute('data-accordion-initialized', '');
+    this.root.setAttribute('data-accordion-initialized', '');
   }
 
   private toggle(trigger: HTMLElement, isOpen: boolean): void {
-    const element = this.element;
-    element.setAttribute('data-accordion-animating', '');
+    const root = this.root;
+    root.setAttribute('data-accordion-animating', '');
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
@@ -80,7 +80,7 @@ class Accordion {
     panel.style.setProperty('overflow', 'clip');
     panel.style.setProperty('will-change', [...new Set(window.getComputedStyle(panel).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
     panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.props.animation.duration, easing: this.props.animation.easing }).addEventListener('finish', () => {
-      element.removeAttribute('data-accordion-animating');
+      root.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['max-height', 'overflow', 'will-change'].forEach(name => panel.style.removeProperty(name));
     });
@@ -88,7 +88,7 @@ class Accordion {
 
   private handleClick(event: MouseEvent): void {
     event.preventDefault();
-    if (this.element.hasAttribute('data-accordion-animating')) return;
+    if (this.root.hasAttribute('data-accordion-animating')) return;
     const trigger = event.currentTarget as HTMLElement;
     this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }
@@ -99,19 +99,19 @@ class Accordion {
     event.preventDefault();
     const focusables = [...this.triggers].filter(trigger => !trigger.hasAttribute('disabled'));
     const active = document.activeElement as HTMLElement;
-    const index = focusables.indexOf(active);
+    const activeIndex = focusables.indexOf(active);
     const length = focusables.length;
-    let newIndex = index;
+    let newIndex = activeIndex;
     switch (key) {
       case ' ':
       case 'Enter':
         active.click();
         return;
       case 'ArrowUp':
-        newIndex = (index - 1 + length) % length;
+        newIndex = (activeIndex - 1 + length) % length;
         break;
       case 'ArrowDown':
-        newIndex = (index + 1) % length;
+        newIndex = (activeIndex + 1) % length;
         break;
       case 'Home':
         newIndex = 0;

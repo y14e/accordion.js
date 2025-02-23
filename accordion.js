@@ -79,19 +79,19 @@ class Accordion {
     event.preventDefault();
     const focusables = [...this.triggers].filter(trigger => !trigger.hasAttribute('disabled'));
     const active = document.activeElement;
-    const activeIndex = focusables.indexOf(active);
+    const currentIndex = focusables.indexOf(active);
     const length = focusables.length;
-    let newIndex = activeIndex;
+    let newIndex = currentIndex;
     switch (key) {
       case ' ':
       case 'Enter':
         active.click();
         return;
       case 'ArrowUp':
-        newIndex = (activeIndex - 1 + length) % length;
+        newIndex = (currentIndex - 1 + length) % length;
         break;
       case 'ArrowDown':
-        newIndex = (activeIndex + 1) % length;
+        newIndex = (currentIndex + 1) % length;
         break;
       case 'Home':
         newIndex = 0;

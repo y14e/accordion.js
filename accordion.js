@@ -51,7 +51,7 @@ class Accordion {
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
-      if (isOpen && opened) this.close(opened);
+      if (isOpen && opened && opened !== trigger) this.close(opened);
     }
     trigger.setAttribute('aria-expanded', String(isOpen));
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));

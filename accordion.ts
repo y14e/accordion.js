@@ -35,8 +35,8 @@ class Accordion {
       },
     };
     this.settings = {
-      selector: Object.assign({}, this.defaults.selector, options?.selector),
-      animation: Object.assign({}, this.defaults.animation, options?.animation),
+      selector: { ...this.defaults.selector, ...options?.selector },
+      animation: { ...this.defaults.animation, ...options?.animation },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
     const NOT_NESTED = `:not(:scope ${this.settings.selector.panel} *)`;

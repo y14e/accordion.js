@@ -1,4 +1,4 @@
-type Props = {
+type AccordionOptions = {
   selector: {
     item: string;
     header: string;
@@ -13,34 +13,37 @@ type Props = {
 
 class Accordion {
   root: HTMLElement;
-  props: Props;
+  defaults: AccordionOptions;
+  settings: AccordionOptions;
   items: NodeListOf<HTMLElement>;
   headers: NodeListOf<HTMLElement>;
   triggers: NodeListOf<HTMLElement>;
   panels: NodeListOf<HTMLElement>;
 
-  constructor(root: HTMLElement, props?: Partial<Props>) {
+  constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
     this.root = root;
-    this.props = {
+    this.defaults = {
       selector: {
         item: ':has(> [data-accordion-header])',
         header: '[data-accordion-header]',
         trigger: '[data-accordion-trigger]',
         panel: '[data-accordion-header] + *',
-        ...props?.selector,
       },
       animation: {
         duration: 300,
         easing: 'ease',
-        ...props?.animation,
       },
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.props.animation.duration = 0;
-    const NOT_NESTED = `:not(:scope ${this.props.selector.panel} *)`;
-    this.items = this.root.querySelectorAll(`${this.props.selector.item}${NOT_NESTED}`);
-    this.headers = this.root.querySelectorAll(`${this.props.selector.header}${NOT_NESTED}`);
-    this.triggers = this.root.querySelectorAll(`${this.props.selector.trigger}${NOT_NESTED}`);
-    this.panels = this.root.querySelectorAll(`${this.props.selector.panel}${NOT_NESTED}`);
+    this.settings = {
+      selector: Object.assign({}, this.defaults.selector, options?.selector),
+      animation: Object.assign({}, this.defaults.animation, options?.animation),
+    };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
+    const NOT_NESTED = `:not(:scope ${this.settings.selector.panel} *)`;
+    this.items = this.root.querySelectorAll(`${this.settings.selector.item}${NOT_NESTED}`);
+    this.headers = this.root.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
+    this.triggers = this.root.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`);
+    this.panels = this.root.querySelectorAll(`${this.settings.selector.panel}${NOT_NESTED}`);
     if (!this.items.length || !this.headers.length || !this.triggers.length || !this.panels.length) return;
     this.initialize();
   }
@@ -79,7 +82,7 @@ class Accordion {
     const height = `${panel.scrollHeight}px`;
     panel.style.setProperty('overflow', 'clip');
     panel.style.setProperty('will-change', [...new Set(window.getComputedStyle(panel).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
-    panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.props.animation.duration, easing: this.props.animation.easing }).addEventListener('finish', () => {
+    panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['max-height', 'overflow', 'will-change'].forEach(name => panel.style.removeProperty(name));

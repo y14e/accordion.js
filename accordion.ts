@@ -1,6 +1,5 @@
 type AccordionOptions = {
   selector: {
-    item: string;
     header: string;
     trigger: string;
     panel: string;
@@ -15,7 +14,6 @@ class Accordion {
   root: HTMLElement;
   defaults: AccordionOptions;
   settings: AccordionOptions;
-  items: NodeListOf<HTMLElement>;
   headers: NodeListOf<HTMLElement>;
   triggers: NodeListOf<HTMLElement>;
   panels: NodeListOf<HTMLElement>;
@@ -24,7 +22,6 @@ class Accordion {
     this.root = root;
     this.defaults = {
       selector: {
-        item: ':has(> [data-accordion-header])',
         header: '[data-accordion-header]',
         trigger: '[data-accordion-trigger]',
         panel: '[data-accordion-header] + *',
@@ -40,11 +37,10 @@ class Accordion {
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
     const NOT_NESTED = `:not(:scope ${this.settings.selector.panel} *)`;
-    this.items = this.root.querySelectorAll(`${this.settings.selector.item}${NOT_NESTED}`);
     this.headers = this.root.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
     this.triggers = this.root.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`);
     this.panels = this.root.querySelectorAll(`${this.settings.selector.panel}${NOT_NESTED}`);
-    if (!this.items.length || !this.headers.length || !this.triggers.length || !this.panels.length) return;
+    if (!this.headers.length || !this.triggers.length || !this.panels.length) return;
     this.initialize();
   }
 

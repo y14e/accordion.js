@@ -78,7 +78,7 @@ class Accordion {
     const height = `${panel.scrollHeight}px`;
     panel.style.setProperty('overflow', 'clip');
     panel.style.setProperty('will-change', [...new Set(window.getComputedStyle(panel).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
-    panel.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
+    panel.animate({ maxHeight: isOpen ? ['0', height] : [height, '0'] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['max-height', 'overflow', 'will-change'].forEach(name => panel.style.removeProperty(name));

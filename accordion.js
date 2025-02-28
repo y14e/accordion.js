@@ -3,6 +3,7 @@ class Accordion {
     this.root = root;
     this.defaults = {
       selector: {
+        item: ':has(> [data-accordion-header])',
         header: '[data-accordion-header]',
         trigger: '[data-accordion-trigger]',
         panel: '[data-accordion-header] + *',
@@ -18,10 +19,11 @@ class Accordion {
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
     const NOT_NESTED = `:not(:scope ${this.settings.selector.panel} *)`;
+    this.items = this.root.querySelectorAll(`${this.settings.selector.item}${NOT_NESTED}`);
     this.headers = this.root.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
     this.triggers = this.root.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`);
     this.panels = this.root.querySelectorAll(`${this.settings.selector.panel}${NOT_NESTED}`);
-    if (!this.headers.length || !this.triggers.length || !this.panels.length) return;
+    if (!this.items.length || !this.headers.length || !this.triggers.length || !this.panels.length) return;
     this.initialize();
   }
 
@@ -56,13 +58,15 @@ class Accordion {
     trigger.setAttribute('aria-expanded', String(isOpen));
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));
     panel.removeAttribute('hidden');
-    const height = `${panel.scrollHeight}px`;
-    panel.style.setProperty('overflow', 'clip');
-    panel.style.setProperty('will-change', [...new Set(window.getComputedStyle(panel).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
-    panel.animate({ maxHeight: isOpen ? ['0', height] : [height, '0'] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
+    const item = trigger.closest(this.settings.selector.item);
+    const min = `${trigger.closest(this.settings.selector.header).scrollHeight}px`;
+    const max = `${parseInt(min) + panel.scrollHeight}px`;
+    item.style.setProperty('overflow', 'clip');
+    item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
+    item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
-      ['max-height', 'overflow', 'will-change'].forEach(name => panel.style.removeProperty(name));
+      ['height', 'overflow', 'will-change'].forEach(name => item.style.removeProperty(name));
     });
   }
 

@@ -11,6 +11,10 @@ type AccordionOptions = {
   };
 };
 
+interface HTMLElement_animation extends HTMLElement {
+  _animation: Animation | null;
+}
+
 class Accordion {
   root: HTMLElement;
   defaults: AccordionOptions;
@@ -69,23 +73,22 @@ class Accordion {
   }
 
   private toggle(trigger: HTMLElement, isOpen: boolean, isMatch = false): void {
-    const root = this.root;
-    root.setAttribute('data-accordion-animating', '');
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
       if (isOpen && opened && opened !== trigger) this.close(opened, isMatch);
     }
     trigger.setAttribute('aria-expanded', String(isOpen));
+    const item = trigger.closest(this.settings.selector.item) as HTMLElement_animation;
+    const height = `${item.offsetHeight}px`;
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
     panel.removeAttribute('hidden');
-    const item = trigger.closest(this.settings.selector.item) as HTMLElement;
     item.style.setProperty('overflow', 'clip');
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
-    const min = `${trigger.closest(this.settings.selector.header)!.scrollHeight}px`;
-    const max = `${parseInt(min) + panel.scrollHeight}px`;
-    item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing }).addEventListener('finish', () => {
-      root.removeAttribute('data-accordion-animating');
+    if (item._animation) item._animation.cancel();
+    item._animation = item.animate({ height: [height, `${trigger.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
+    item._animation.addEventListener('finish', () => {
+      item._animation = null;
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['height', 'overflow', 'will-change'].forEach(name => item.style.removeProperty(name));
     });
@@ -93,7 +96,6 @@ class Accordion {
 
   private handleClick(event: MouseEvent): void {
     event.preventDefault();
-    if (this.root.hasAttribute('data-accordion-animating')) return;
     const trigger = event.currentTarget as HTMLElement;
     this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }

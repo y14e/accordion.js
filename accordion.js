@@ -48,23 +48,22 @@ class Accordion {
   }
 
   toggle(trigger, isOpen, isMatch = false) {
-    const root = this.root;
-    root.setAttribute('data-accordion-animating', '');
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
       if (isOpen && opened && opened !== trigger) this.close(opened, isMatch);
     }
     trigger.setAttribute('aria-expanded', String(isOpen));
+    const item = trigger.closest(this.settings.selector.item);
+    const height = `${item.offsetHeight}px`;
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));
     panel.removeAttribute('hidden');
-    const item = trigger.closest(this.settings.selector.item);
     item.style.setProperty('overflow', 'clip');
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
-    const min = `${trigger.closest(this.settings.selector.header).scrollHeight}px`;
-    const max = `${parseInt(min) + panel.scrollHeight}px`;
-    item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing }).addEventListener('finish', () => {
-      root.removeAttribute('data-accordion-animating');
+    if (item._animation) item._animation.cancel();
+    item._animation = item.animate({ height: [height, `${trigger.closest(this.settings.selector.header).scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
+    item._animation.addEventListener('finish', () => {
+      item._animation = null;
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['height', 'overflow', 'will-change'].forEach(name => item.style.removeProperty(name));
     });
@@ -72,7 +71,6 @@ class Accordion {
 
   handleClick(event) {
     event.preventDefault();
-    if (this.root.hasAttribute('data-accordion-animating')) return;
     const trigger = event.currentTarget;
     this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }

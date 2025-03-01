@@ -59,10 +59,10 @@ class Accordion {
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));
     panel.removeAttribute('hidden');
     const item = trigger.closest(this.settings.selector.item);
-    const min = `${trigger.closest(this.settings.selector.header).scrollHeight}px`;
-    const max = `${parseInt(min) + panel.scrollHeight}px`;
     item.style.setProperty('overflow', 'clip');
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
+    const min = `${trigger.closest(this.settings.selector.header).scrollHeight}px`;
+    const max = `${parseInt(min) + panel.scrollHeight}px`;
     item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');

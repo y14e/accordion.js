@@ -68,13 +68,13 @@ class Accordion {
     this.root.setAttribute('data-accordion-initialized', '');
   }
 
-  private toggle(trigger: HTMLElement, isOpen: boolean): void {
+  private toggle(trigger: HTMLElement, isOpen: boolean, isMatch = false): void {
     const root = this.root;
     root.setAttribute('data-accordion-animating', '');
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
-      if (isOpen && opened && opened !== trigger) this.close(opened);
+      if (isOpen && opened && opened !== trigger) this.close(opened, isMatch);
     }
     trigger.setAttribute('aria-expanded', String(isOpen));
     const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
@@ -84,7 +84,7 @@ class Accordion {
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
     const min = `${trigger.closest(this.settings.selector.header)!.scrollHeight}px`;
     const max = `${parseInt(min) + panel.scrollHeight}px`;
-    item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
+    item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['height', 'overflow', 'will-change'].forEach(name => item.style.removeProperty(name));
@@ -129,15 +129,15 @@ class Accordion {
   }
 
   private handleBeforeMatch(event: Event): void {
-    this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement);
+    this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement, true);
   }
 
-  open(trigger: HTMLElement): void {
-    this.toggle(trigger, true);
+  open(trigger: HTMLElement, isMatch = false): void {
+    this.toggle(trigger, true, isMatch);
   }
 
-  close(trigger: HTMLElement): void {
-    this.toggle(trigger, false);
+  close(trigger: HTMLElement, isMatch = false): void {
+    this.toggle(trigger, false, isMatch);
   }
 }
 

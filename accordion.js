@@ -47,13 +47,13 @@ class Accordion {
     this.root.setAttribute('data-accordion-initialized', '');
   }
 
-  toggle(trigger, isOpen) {
+  toggle(trigger, isOpen, isMatch = false) {
     const root = this.root;
     root.setAttribute('data-accordion-animating', '');
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
-      if (isOpen && opened && opened !== trigger) this.close(opened);
+      if (isOpen && opened && opened !== trigger) this.close(opened, isMatch);
     }
     trigger.setAttribute('aria-expanded', String(isOpen));
     const panel = document.getElementById(trigger.getAttribute('aria-controls'));
@@ -63,7 +63,7 @@ class Accordion {
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
     const min = `${trigger.closest(this.settings.selector.header).scrollHeight}px`;
     const max = `${parseInt(min) + panel.scrollHeight}px`;
-    item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
+    item.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-accordion-animating');
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['height', 'overflow', 'will-change'].forEach(name => item.style.removeProperty(name));
@@ -108,15 +108,15 @@ class Accordion {
   }
 
   handleBeforeMatch(event) {
-    this.open(document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`));
+    this.open(document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`), true);
   }
 
-  open(trigger) {
-    this.toggle(trigger, true);
+  open(trigger, isMatch = false) {
+    this.toggle(trigger, true, isMatch);
   }
 
-  close(trigger) {
-    this.toggle(trigger, false);
+  close(trigger, isMatch = false) {
+    this.toggle(trigger, false, isMatch);
   }
 }
 

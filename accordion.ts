@@ -12,7 +12,7 @@ type AccordionOptions = {
 };
 
 interface HTMLElement_animation extends HTMLElement {
-  _animation: Animation | null;
+  _animation?: Animation | null;
 }
 
 class Accordion {

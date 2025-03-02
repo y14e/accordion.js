@@ -104,16 +104,16 @@ class Accordion {
     const { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
-    const focusables = [...this.triggers].filter(trigger => trigger.getAttribute('aria-disabled') !== 'true' && !trigger.hasAttribute('disabled'));
     const active = document.activeElement as HTMLElement;
+    if ([' ', 'Enter'].includes(key)) {
+      active.click();
+      return;
+    }
+    const focusables = [...this.triggers].filter(trigger => trigger.getAttribute('aria-disabled') !== 'true' && !trigger.hasAttribute('disabled'));
     const currentIndex = focusables.indexOf(active);
     const length = focusables.length;
     let newIndex = currentIndex;
     switch (key) {
-      case ' ':
-      case 'Enter':
-        active.click();
-        return;
       case 'ArrowUp':
         newIndex = (currentIndex - 1 + length) % length;
         break;

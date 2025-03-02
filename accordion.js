@@ -53,9 +53,9 @@ class Accordion {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
       if (isOpen && opened && opened !== trigger) this.close(opened, isMatch);
     }
-    trigger.setAttribute('aria-expanded', String(isOpen));
     const item = trigger.closest(this.settings.selector.item);
     const height = `${item.offsetHeight}px`;
+    trigger.setAttribute('aria-expanded', String(isOpen));
     item.style.setProperty('overflow', 'clip');
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
     if (item._animation) item._animation.cancel();

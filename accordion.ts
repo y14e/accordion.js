@@ -84,7 +84,7 @@ class Accordion {
     item.style.setProperty('overflow', 'clip');
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
     if (item._animation) item._animation.cancel();
-    const panel = document.getElementById(trigger.getAttribute('aria-controls') as string) as HTMLElement;
+    const panel = document.getElementById(trigger.getAttribute('aria-controls')!) as HTMLElement;
     panel.removeAttribute('hidden');
     item._animation = item.animate({ height: [height, `${trigger.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     item._animation.addEventListener('finish', () => {
@@ -131,7 +131,7 @@ class Accordion {
   }
 
   private handleBeforeMatch(event: Event): void {
-    this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement, true);
+    this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`)!, true);
   }
 
   open(trigger: HTMLElement, isMatch = false): void {

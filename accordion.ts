@@ -104,7 +104,7 @@ class Accordion {
     const { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
-    const focusables = [...this.triggers].filter(trigger => !trigger.hasAttribute('disabled'));
+    const focusables = [...this.triggers].filter(trigger => trigger.getAttribute('aria-disabled') !== 'true' && !trigger.hasAttribute('disabled'));
     const active = document.activeElement as HTMLElement;
     const currentIndex = focusables.indexOf(active);
     const length = focusables.length;

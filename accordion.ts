@@ -11,10 +11,6 @@ type AccordionOptions = {
   };
 };
 
-interface HTMLElement_animation extends HTMLElement {
-  _animation?: Animation | null;
-}
-
 class Accordion {
   root: HTMLElement;
   defaults: AccordionOptions;
@@ -23,6 +19,7 @@ class Accordion {
   headers: NodeListOf<HTMLElement>;
   triggers: NodeListOf<HTMLElement>;
   panels: NodeListOf<HTMLElement>;
+  animations: (Animation | null)[] = [];
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
     this.root = root;
@@ -49,6 +46,7 @@ class Accordion {
     this.triggers = this.root.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`);
     this.panels = this.root.querySelectorAll(`${this.settings.selector.panel}${NOT_NESTED}`);
     if (!this.items.length || !this.headers.length || !this.triggers.length || !this.panels.length) return;
+    this.animations = Array(this.items.length).fill(null);
     this.initialize();
   }
 
@@ -78,17 +76,19 @@ class Accordion {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
       if (isOpen && opened && opened !== trigger) this.close(opened, isMatch);
     }
-    const item = trigger.closest(this.settings.selector.item) as HTMLElement_animation;
+    const item = trigger.closest(this.settings.selector.item) as HTMLElement;
     const height = `${item.offsetHeight}px`;
     trigger.setAttribute('aria-expanded', String(isOpen));
     item.style.setProperty('overflow', 'clip');
     item.style.setProperty('will-change', [...new Set(window.getComputedStyle(item).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
-    if (item._animation) item._animation.cancel();
+    const index = [...this.triggers].indexOf(trigger);
+    let animation = this.animations[index];
+    if (animation) animation.cancel();
     const panel = document.getElementById(trigger.getAttribute('aria-controls')!) as HTMLElement;
     panel.removeAttribute('hidden');
-    item._animation = item.animate({ height: [height, `${trigger.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
-    item._animation.addEventListener('finish', () => {
-      item._animation = null;
+    animation = this.animations[index] = item.animate({ height: [height, `${trigger.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
+    animation.addEventListener('finish', () => {
+      animation = null;
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['height', 'overflow', 'will-change'].forEach(name => item.style.removeProperty(name));
     });

@@ -88,7 +88,7 @@ class Accordion {
     panel.removeAttribute('hidden');
     animation = this.animations[index] = item.animate({ height: [height, `${trigger.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
-      animation = null;
+      this.animations[index] = null;
       if (!isOpen) panel.setAttribute('hidden', 'until-found');
       ['height', 'overflow', 'will-change'].forEach(name => item.style.removeProperty(name));
     });

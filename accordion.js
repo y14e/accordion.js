@@ -49,6 +49,7 @@ class Accordion {
   }
 
   toggle(trigger, isOpen, isMatch = false) {
+    if ((trigger.getAttribute('aria-expanded') === 'true') === isOpen) return;
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);

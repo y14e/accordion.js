@@ -65,7 +65,6 @@ class Accordion {
     this.panels.forEach((panel, i) => {
       const trigger = this.triggers[i];
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${trigger.getAttribute('id')}`.trim());
-      if (panel.hasAttribute('hidden')) panel.setAttribute('hidden', this.isFocusable(trigger) ? 'until-found' : '');
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => this.handlePanelBeforeMatch(event));
     });
@@ -116,7 +115,7 @@ class Accordion {
       active.click();
       return;
     }
-    const focusableTriggers = [...this.triggers].filter(trigger => trigger.getAttribute('aria-disabled') !== 'true' && !trigger.hasAttribute('disabled'));
+    const focusableTriggers = [...this.triggers].filter(this.isFocusable);
     const currentIndex = focusableTriggers.indexOf(active);
     const length = focusableTriggers.length;
     let newIndex = currentIndex;

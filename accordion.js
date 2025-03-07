@@ -43,7 +43,6 @@ class Accordion {
     this.panels.forEach((panel, i) => {
       const trigger = this.triggers[i];
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${trigger.getAttribute('id')}`.trim());
-      if (panel.hasAttribute('hidden')) panel.setAttribute('hidden', this.isFocusable(trigger) ? 'until-found' : '');
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => this.handlePanelBeforeMatch(event));
     });

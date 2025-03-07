@@ -1,6 +1,6 @@
 class Accordion {
   constructor(root, options) {
-    this.root = root;
+    this.rootElement = root;
     this.defaults = {
       selector: {
         section: ':has(> [data-accordion-header])',
@@ -18,21 +18,21 @@ class Accordion {
       animation: { ...this.defaults.animation, ...options?.animation },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
-    const NOT_NESTED = `:not(:scope ${this.settings.selector.panel} *)`;
-    this.sections = this.root.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`);
-    this.headers = this.root.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
-    this.buttons = this.root.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`);
-    this.panels = this.root.querySelectorAll(`${this.settings.selector.panel}${NOT_NESTED}`);
-    if (!this.sections.length || !this.headers.length || !this.buttons.length || !this.panels.length) return;
-    this.animations = Array(this.sections.length).fill(null);
+    let NOT_NESTED = `:not(:scope ${this.settings.selector.panel} *)`;
+    this.sectionElements = this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`);
+    this.headerElements = this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
+    this.buttonElements = this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`);
+    this.panelElements = this.rootElement.querySelectorAll(`${this.settings.selector.panel}${NOT_NESTED}`);
+    if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.panelElements.length) return;
+    this.animations = Array(this.sectionElements.length).fill(null);
     this.initialize();
   }
 
   initialize() {
-    this.buttons.forEach((button, i) => {
-      const id = Math.random().toString(36).slice(-8);
+    this.buttonElements.forEach((button, i) => {
+      let id = Math.random().toString(36).slice(-8);
       button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
-      const panel = this.panels[i];
+      let panel = this.panelElements[i];
       panel.setAttribute('id', panel.getAttribute('id') || `accordion-panel-${id}`);
       button.setAttribute('aria-controls', panel.getAttribute('id'));
       button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
@@ -40,13 +40,13 @@ class Accordion {
       button.addEventListener('click', event => this.handleButtonClick(event));
       button.addEventListener('keydown', event => this.handleButtonKeyDown(event));
     });
-    this.panels.forEach((panel, i) => {
-      const button = this.buttons[i];
+    this.panelElements.forEach((panel, i) => {
+      let button = this.buttonElements[i];
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${button.getAttribute('id')}`.trim());
       panel.setAttribute('role', 'region');
       panel.addEventListener('beforematch', event => this.handlePanelBeforeMatch(event));
     });
-    this.root.setAttribute('data-accordion-initialized', '');
+    this.rootElement.setAttribute('data-accordion-initialized', '');
   }
 
   isFocusable(element) {
@@ -55,20 +55,20 @@ class Accordion {
 
   toggle(button, isOpen, isMatch = false) {
     if ((button.getAttribute('aria-expanded') === 'true') === isOpen) return;
-    const name = button.getAttribute('data-accordion-name');
+    let name = button.getAttribute('data-accordion-name');
     if (name) {
-      const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
+      let opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
       if (isOpen && opened && opened !== button) this.close(opened, isMatch);
     }
-    const section = button.closest(this.settings.selector.section);
-    const height = `${section.offsetHeight}px`;
+    let section = button.closest(this.settings.selector.section);
+    let height = `${section.offsetHeight}px`;
     button.setAttribute('aria-expanded', String(isOpen));
     section.style.setProperty('overflow', 'clip');
     section.style.setProperty('will-change', [...new Set(window.getComputedStyle(section).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
-    const index = [...this.buttons].indexOf(button);
+    let index = [...this.buttonElements].indexOf(button);
     let animation = this.animations[index];
     if (animation) animation.cancel();
-    const panel = document.getElementById(button.getAttribute('aria-controls'));
+    let panel = document.getElementById(button.getAttribute('aria-controls'));
     panel.removeAttribute('hidden');
     animation = this.animations[index] = section.animate({ height: [height, `${button.closest(this.settings.selector.header).scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
@@ -80,22 +80,22 @@ class Accordion {
 
   handleButtonClick(event) {
     event.preventDefault();
-    const button = event.currentTarget;
+    let button = event.currentTarget;
     this.toggle(button, button.getAttribute('aria-expanded') !== 'true');
   }
 
   handleButtonKeyDown(event) {
-    const { key } = event;
+    let { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
-    const active = document.activeElement;
+    let active = document.activeElement;
     if ([' ', 'Enter'].includes(key)) {
       active.click();
       return;
     }
-    const focusableButtons = [...this.buttons].filter(this.isFocusable);
-    const currentIndex = focusableButtons.indexOf(active);
-    const length = focusableButtons.length;
+    let focusableButtons = [...this.buttonElements].filter(this.isFocusable);
+    let currentIndex = focusableButtons.indexOf(active);
+    let length = focusableButtons.length;
     let newIndex = currentIndex;
     switch (key) {
       case 'ArrowUp':

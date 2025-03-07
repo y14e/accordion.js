@@ -58,6 +58,7 @@ class Accordion {
       panel.setAttribute('id', panel.getAttribute('id') || `accordion-panel-${id}`);
       trigger.setAttribute('aria-controls', panel.getAttribute('id')!);
       trigger.setAttribute('tabindex', this.isFocusable(trigger) ? '0' : '-1');
+      if (!this.isFocusable(trigger)) trigger.style.setProperty('pointer-events', 'none');
       trigger.addEventListener('click', event => this.handleTriggerClick(event));
       trigger.addEventListener('keydown', event => this.handleTriggerKeyDown(event));
     });
@@ -101,9 +102,8 @@ class Accordion {
   }
 
   private handleTriggerClick(event: MouseEvent): void {
-    const trigger = event.currentTarget as HTMLElement;
-    if (!this.isFocusable(trigger)) return;
     event.preventDefault();
+    const trigger = event.currentTarget as HTMLElement;
     this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }
 

@@ -58,8 +58,8 @@ class Accordion {
       panel.setAttribute('id', panel.getAttribute('id') || `accordion-panel-${id}`);
       trigger.setAttribute('aria-controls', panel.getAttribute('id')!);
       trigger.setAttribute('tabindex', '0');
-      trigger.addEventListener('click', event => this.handleClick(event));
-      trigger.addEventListener('keydown', event => this.handleKeyDown(event));
+      trigger.addEventListener('click', event => this.handleTriggerClick(event));
+      trigger.addEventListener('keydown', event => this.handleTriggerKeyDown(event));
     });
     this.panels.forEach((panel, i) => {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].getAttribute('id')}`.trim());
@@ -95,13 +95,13 @@ class Accordion {
     });
   }
 
-  private handleClick(event: MouseEvent): void {
+  private handleTriggerClick(event: MouseEvent): void {
     event.preventDefault();
     const trigger = event.currentTarget as HTMLElement;
     this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }
 
-  private handleKeyDown(event: KeyboardEvent): void {
+  private handleTriggerKeyDown(event: KeyboardEvent): void {
     const { key } = event;
     if (![' ', 'Enter', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
@@ -110,9 +110,9 @@ class Accordion {
       active.click();
       return;
     }
-    const focusables = [...this.triggers].filter(trigger => trigger.getAttribute('aria-disabled') !== 'true' && !trigger.hasAttribute('disabled'));
-    const currentIndex = focusables.indexOf(active);
-    const length = focusables.length;
+    const nonDisabledTriggers = [...this.triggers].filter(trigger => trigger.getAttribute('aria-disabled') !== 'true' && !trigger.hasAttribute('disabled'));
+    const currentIndex = nonDisabledTriggers.indexOf(active);
+    const length = nonDisabledTriggers.length;
     let newIndex = currentIndex;
     switch (key) {
       case 'ArrowUp':
@@ -128,7 +128,7 @@ class Accordion {
         newIndex = length - 1;
         break;
     }
-    focusables[newIndex].focus();
+    nonDisabledTriggers[newIndex].focus();
   }
 
   private handleBeforeMatch(event: Event): void {

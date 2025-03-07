@@ -65,7 +65,7 @@ class Accordion {
       panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.triggers[i].getAttribute('id')}`.trim());
       if (panel.hasAttribute('hidden')) panel.setAttribute('hidden', 'until-found');
       panel.setAttribute('role', 'region');
-      panel.addEventListener('beforematch', event => this.handleBeforeMatch(event));
+      panel.addEventListener('beforematch', event => this.handlePanelBeforeMatch(event));
     });
     this.root.setAttribute('data-accordion-initialized', '');
   }
@@ -131,7 +131,7 @@ class Accordion {
     nonDisabledTriggers[newIndex].focus();
   }
 
-  private handleBeforeMatch(event: Event): void {
+  private handlePanelBeforeMatch(event: Event): void {
     this.open(document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`)!, true);
   }
 

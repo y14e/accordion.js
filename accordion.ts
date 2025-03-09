@@ -83,19 +83,27 @@ class Accordion {
     }
     let section = button.closest(this.settings.selector.section) as HTMLElement;
     let height = `${section.offsetHeight}px`;
-    button.setAttribute('aria-expanded', String(isOpen));
+    window.requestAnimationFrame(() => button.setAttribute('aria-expanded', String(isOpen)));
     section.style.setProperty('overflow', 'clip');
     section.style.setProperty('will-change', [...new Set(window.getComputedStyle(section).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
     let index = [...this.buttonElements].indexOf(button);
     let animation = this.animations[index];
     if (animation) animation.cancel();
     let panel = document.getElementById(button.getAttribute('aria-controls')!) as HTMLElement;
-    panel.removeAttribute('hidden');
-    animation = this.animations[index] = section.animate({ height: [height, `${button.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
-    animation.addEventListener('finish', () => {
-      this.animations[index] = null;
-      if (!isOpen) panel.setAttribute('hidden', 'until-found');
-      ['height', 'overflow', 'will-change'].forEach(name => section.style.removeProperty(name));
+    if (isOpen) {
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => panel.removeAttribute('hidden')));
+    } else {
+      panel.setAttribute('hidden', 'until-found');
+    }
+    panel.style.setProperty('content-visibility', 'visible');
+    panel.style.setProperty('display', 'block');
+    window.requestAnimationFrame(() => {
+      animation = this.animations[index] = section.animate({ height: [height, `${button.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
+      animation.addEventListener('finish', () => {
+        this.animations[index] = null;
+        ['height', 'overflow', 'will-change'].forEach(name => section.style.removeProperty(name));
+        ['content-visibility', 'display'].forEach(name => panel.style.removeProperty(name));
+      });
     });
   }
 

@@ -54,7 +54,6 @@ class Accordion {
   }
 
   toggle(button, isOpen, isMatch = false) {
-    if ((button.getAttribute('aria-expanded') === 'true') === isOpen) return;
     let name = button.getAttribute('data-accordion-name');
     if (name) {
       let opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
@@ -115,14 +114,18 @@ class Accordion {
   }
 
   handlePanelBeforeMatch(event) {
-    this.open(document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`), true);
+    let button = document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
+    if (button.getAttribute('aria-expanded') === 'true') return;
+    this.open(button, true);
   }
 
   open(button, isMatch = false) {
+    if (button.getAttribute('aria-expanded') === 'true') return;
     this.toggle(button, true, isMatch);
   }
 
   close(button, isMatch = false) {
+    if (button.getAttribute('aria-expanded') !== 'true') return;
     this.toggle(button, false, isMatch);
   }
 }
